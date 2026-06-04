@@ -7,7 +7,6 @@
       "DOM.Iterable",
       "ESNext.Disposable"
     ],
-    ,
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
