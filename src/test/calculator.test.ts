@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { compute, formatResult, calcReducer } from "../calculator/logic";
 import { initialState } from "../calculator/state";
-import { OPERATORS } from "../calculator/types";
+import { OPERATORS, type Operator } from "../calculator/types";
 import type { CalcAction } from "../calculator/logic";
+import type { CalcState } from "../calculator/state";
 
 // ─── HELPER ──────────────────────────────────────────────────────────────────
 //
@@ -18,8 +19,8 @@ import type { CalcAction } from "../calculator/logic";
 // Each string maps 1:1 to a CalcAction. If you add a new action type,
 // you add a new case here and the rest of the tests stay untouched.
 
-function dispatch(actions: string[]): ReturnType<typeof calcReducer> {
-    return actions.reduce((state, action) => {
+function dispatch(actions: string[]): CalcState {
+    return actions.reduce<CalcState>((state, action) => {
         const [type, payload] = action.split(":");
 
         let calcAction: CalcAction;
@@ -28,14 +29,17 @@ function dispatch(actions: string[]): ReturnType<typeof calcReducer> {
             case "digit":
                 calcAction = { type: "digit", payload: payload ?? "0" };
                 break;
-            case "operator":
-                calcAction = {
-                    type: "operator",
-                    payload: payload as keyof typeof OPERATORS extends string
-                        ? (typeof OPERATORS)[keyof typeof OPERATORS]
-                        : never ?? OPERATORS.ADD,
+            case "operator": {
+                const opMap: Record<string, Operator> = {
+                    "+": OPERATORS.ADD,
+                    "-": OPERATORS.SUBTRACT,
+                    "*": OPERATORS.MULTIPLY,
+                    "/": OPERATORS.DIVIDE,
                 };
+                const op = opMap[payload ?? "+"] ?? OPERATORS.ADD;
+                calcAction = { type: "operator", payload: op };
                 break;
+            }
             case "decimal":
                 calcAction = { type: "decimal" };
                 break;
