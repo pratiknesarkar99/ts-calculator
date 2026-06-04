@@ -1,73 +1,63 @@
-# React + TypeScript + Vite
+# ts-calculator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A small calculator demo built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+This repository includes a typed calculator implementation with:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + Vite 8 frontend
+- TypeScript 6 application logic
+- Data-driven button layout in `src/App.tsx`
+- Reducer-based calculator state in `src/calculator/logic.ts`
+- Keyboard support for digits, operators, Enter, Backspace, and Escape
+- Unit tests with Vitest
 
-## React Compiler
+## Getting started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Install dependencies:
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Start the dev server:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Open the local URL shown by Vite to view the calculator.
+
+## Available scripts
+
+- `npm run dev` - start the Vite development server
+- `npm run build` - compile TypeScript and build production assets
+- `npm run preview` - preview the production build locally
+- `npm run lint` - run ESLint across the project
+- `npm run test` - run unit tests with Vitest
+- `npm run test:ui` - run Vitest in interactive UI mode
+
+## Project structure
+
+- `src/App.tsx` - calculator UI and button rendering
+- `src/calculator/useCalculator.ts` - hook providing display state and action handlers
+- `src/calculator/logic.ts` - calculator reducer and core logic
+- `src/calculator/state.ts` - initial calculator state
+- `src/calculator/types.ts` - shared operator and type definitions
+- `src/index.css` - application styling
+
+## Features
+
+- Basic arithmetic: add, subtract, multiply, divide
+- Decimal input and zero handling
+- Clear entry (`C`) and all clear (`AC`)
+- Keyboard shortcuts:
+  - Digits `0-9`
+  - Decimal `.`
+  - Operators `+`, `-`, `*`, `/`
+  - `Enter` / `=` for result
+  - `Backspace` for clear entry
+  - `Escape` for all clear
+
+## Notes
+
+This is a private Vite app intended as a TypeScript React demo. For stricter linting, update `eslint.config.js` with additional type-aware or React-specific ESLint rules.
