@@ -1,5 +1,5 @@
 import type { Operator, ValidatedDisplay, RawEntry } from "./types";
-import { INITIAL_DISPLAY, toValidatedDisplay, toRawEntry } from "./types";
+import { INITIAL_DISPLAY, toValidatedDisplay, toRawEntry, MAX_DECIMAL_PLACES, MAX_DIGITS } from "./types";
 
 // ─── 1. WHY DISCRIMINATED UNIONS FOR STATE ───────────────────────────────────
 //
@@ -173,14 +173,27 @@ export function transitionOnDigit(
         };
     }
 
-    // entering_first or entering_second: append the digit
-    const raw = state.entry;
-    const digits = raw.replace(".", "").replace("-", "");
-    if (digits.length >= 8) return state;
+    // ── DECIMAL PLACE CAP ────────────────────────────────────────────────────
+    //
+    // If the current entry already has a decimal point, count how many
+    // digits follow it. If we are already at MAX_DECIMAL_PLACES, ignore
+    // the incoming digit entirely. This is the 3 decimal place enforcement.
+    //
+    // We check this before the total digit cap so both rules are applied
+    // independently. A number like "123.456" has 6 total digits but hits
+    // the decimal cap first.
 
-    const newEntry = toRawEntry(
-        raw === "0" ? digit : raw + digit
-    );
+    const raw = state.entry;
+
+    if (raw.includes(".")) {
+        const decimalPart = raw.split(".")[1] ?? "";
+        if (decimalPart.length >= MAX_DECIMAL_PLACES) return state;
+    }
+
+    const digits = raw.replace(".", "").replace("-", "");
+    if (digits.length >= MAX_DIGITS) return state;
+
+    const newEntry = toRawEntry(raw === "0" ? digit : raw + digit);
     return {
         ...state,
         entry: newEntry,
@@ -235,4 +248,59 @@ export function transitionOnClear(state: CalcState): CalcState {
 
     // entering_first or result: reset display to 0
     return initialState;
+}
+
+export function transitionOnToggleSign(state: CalcState): CalcState {
+    // ── TOGGLE SIGN ──────────────────────────────────────────────────────────
+    //
+    // Flips the sign of whatever number is currently on the display.
+    // Behavior depends on which state we are in:
+    //
+    //   idle             → nothing to toggle, 0 stays 0
+    //   entering_first   → negate the raw entry in progress
+    //   awaiting_second  → negate the first operand already locked in
+    //   entering_second  → negate the raw entry in progress
+    //   result           → negate the result
+    //   error            → ignore
+    //
+    // Negating "0" is a no-op. We check for that explicitly to avoid
+    // producing "-0" in the display, which is technically valid IEEE 754
+    // but visually confusing and unexpected for a calculator user.
+    console.log("[toggleSign] called with state:", state.kind, state);
+
+    if (state.kind === "error" || state.kind === "idle") return state;
+
+    if (state.kind === "entering_first" || state.kind === "entering_second") {
+        if (state.entry === "0" || state.entry === "0.") return state;
+        const toggled = state.entry.startsWith("-")
+            ? toRawEntry(state.entry.slice(1))
+            : toRawEntry("-" + state.entry);
+        return {
+            ...state,
+            entry: toggled,
+            display: toValidatedDisplay(toggled),
+        };
+    }
+
+    if (state.kind === "awaiting_second") {
+        if (state.firstOperand === 0) return state;
+        const toggled = -state.firstOperand;
+        return {
+            ...state,
+            firstOperand: toggled,
+            display: toValidatedDisplay(String(toggled)),
+        };
+    }
+
+    if (state.kind === "result") {
+        if (state.result === 0) return state;
+        const toggled = -state.result;
+        return {
+            kind: "result",
+            result: toggled,
+            display: toValidatedDisplay(String(toggled)),
+        };
+    }
+
+    return assertNever(state);
 }

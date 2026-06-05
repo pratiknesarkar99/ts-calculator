@@ -124,6 +124,10 @@ body {
     gap: 10px;
 }
 
+.keypad__row:first-child {
+    grid-template-columns: repeat(5, 1fr);
+}
+
 /* last row: 0 spans 2 cols, dot spans 1 */
 .keypad__row:last-child {
     grid-template-columns: repeat(3, 1fr);
@@ -205,6 +209,17 @@ body {
 
 .btn-allclear:hover {
     background: #452828;
+}
+
+.btn-toggle {
+    background: var(--bg-btn);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-toggle:hover {
+    background: var(--btn-hover, #38383a);
 }
 
 /* ── RESPONSIVE ────────────────────────────────────────────────────────────── */

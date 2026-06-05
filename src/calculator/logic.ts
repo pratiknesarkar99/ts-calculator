@@ -7,6 +7,7 @@ import {
     transitionOnDigit,
     transitionOnDecimal,
     transitionOnClear,
+    transitionOnToggleSign,
 } from "./state";
 import { toValidatedDisplay, toRawEntry } from "./types";
 
@@ -270,13 +271,15 @@ export function transitionOnEquals(state: CalcState): CalcState {
 // more. A `digit` action carries the digit string. A `clear` action
 // carries nothing. TypeScript enforces this at every call site.
 
+// Add to CalcAction union
 export type CalcAction =
     | { type: "digit"; payload: string }
     | { type: "decimal" }
     | { type: "operator"; payload: Operator }
     | { type: "equals" }
     | { type: "clear" }
-    | { type: "allClear" };
+    | { type: "allClear" }
+    | { type: "toggleSign" };
 
 export function calcReducer(state: CalcState, action: CalcAction): CalcState {
     switch (action.type) {
@@ -292,6 +295,8 @@ export function calcReducer(state: CalcState, action: CalcAction): CalcState {
             return transitionOnClear(state);
         case "allClear":
             return initialState;
+        case "toggleSign":
+            return transitionOnToggleSign(state);
         default:
             return assertNever(action);
     }

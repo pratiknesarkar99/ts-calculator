@@ -31,11 +31,14 @@ type ButtonConfig =
   | { type: "operator"; op: Operator; label: string }
   | { type: "equals"; label: string }
   | { type: "clear"; label: string }
-  | { type: "allClear"; label: string };
+  | { type: "allClear"; label: string }
+  | { type: "toggleSign"; label: string };
+
 
 const BUTTON_GRID = [
   [
     { type: "allClear", label: "AC" },
+    { type: "toggleSign", label: "+/-" },
     { type: "clear", label: "C" },
     { type: "operator", op: OPERATORS.DIVIDE, label: "÷" },
     { type: "operator", op: OPERATORS.MULTIPLY, label: "×" },
@@ -80,6 +83,7 @@ function getButtonClass(btn: ButtonConfig): string {
     case "equals": return `${base} btn-equals`;
     case "clear": return `${base} btn-clear`;
     case "allClear": return `${base} btn-allclear`;
+    case "toggleSign": return `${base} btn-toggle`;
   }
 }
 
@@ -119,6 +123,9 @@ export default function App() {
         case "equals": return handlers.onEquals();
         case "clear": return handlers.onClear();
         case "allClear": return handlers.onAllClear();
+        case "toggleSign":
+          console.log("[toggleSign] button clicked");
+          return handlers.onToggleSign();
       }
     }
 

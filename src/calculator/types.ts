@@ -34,6 +34,7 @@ export const OPERATORS = {
 } as const satisfies Record<string, Operator>;
 
 export const MAX_DIGITS = 8 as const;
+export const MAX_DECIMAL_PLACES = 3 as const;
 export const ERROR_DISPLAY = "ERR" as const;
 export const INITIAL_DISPLAY = "0" as const;
 

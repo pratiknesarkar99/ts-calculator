@@ -40,6 +40,7 @@ export type UseCalculatorReturn = Readonly<{
         onEquals: () => void;
         onClear: () => void;
         onAllClear: () => void;
+        onToggleSign: () => void;
     }>;
 }>;
 
@@ -63,7 +64,7 @@ export type UseCalculatorReturn = Readonly<{
 // catch any mismatch between branches.
 
 function deriveDisplayProps(state: ReturnType<typeof calcReducer>) {
-    const display = String(state.display);
+    const display = state.display as string;
     const isError = state.kind === "error";
 
     let expression = "";
@@ -220,6 +221,13 @@ export function useCalculator(): UseCalculatorReturn {
         ),
         onAllClear: useCallback(
             () => dispatch({ type: "allClear" }),
+            []
+        ),
+        onToggleSign: useCallback(
+            () => {
+                console.log("[toggleSign] handler fired");
+                dispatch({ type: "toggleSign" });
+            },
             []
         ),
     };

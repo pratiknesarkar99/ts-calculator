@@ -392,4 +392,60 @@ describe("calcReducer()", () => {
         });
     });
 
+    describe("toggle sign", () => {
+        it("negates a positive entry", () => {
+            const state = dispatch(["digit:5", "digit:3"]);
+            const toggled = calcReducer(state, { type: "toggleSign" });
+            expect(String(toggled.display)).toBe("-53");
+        });
+
+        it("removes negative sign from a negative entry", () => {
+            const state = dispatch(["digit:5", "digit:3"]);
+            const once = calcReducer(state, { type: "toggleSign" });
+            const twice = calcReducer(once, { type: "toggleSign" });
+            expect(String(twice.display)).toBe("53");
+        });
+
+        it("does not toggle 0", () => {
+            const state = dispatch(["digit:0"]);
+            const toggled = calcReducer(state, { type: "toggleSign" });
+            expect(String(toggled.display)).toBe("0");
+        });
+
+        it("toggles sign of a result", () => {
+            const state = dispatch(["digit:4", "operator:+", "digit:3", "equals"]);
+            const toggled = calcReducer(state, { type: "toggleSign" });
+            expect(String(toggled.display)).toBe("-7");
+        });
+
+        it("does nothing in error state", () => {
+            const state = dispatch(["digit:5", "operator:/", "digit:0", "equals"]);
+            const toggled = calcReducer(state, { type: "toggleSign" });
+            expect(toggled.kind).toBe("error");
+        });
+    });
+
+    describe("decimal place cap", () => {
+        it("allows up to 3 decimal places", () => {
+            const state = dispatch(["digit:1", "decimal", "digit:4", "digit:1", "digit:5"]);
+            expect(String(state.display)).toBe("1.415");
+        });
+
+        it("ignores a 4th decimal place", () => {
+            const state = dispatch([
+                "digit:1", "decimal",
+                "digit:4", "digit:1", "digit:5", "digit:9"  // 9 should be ignored
+            ]);
+            expect(String(state.display)).toBe("1.415");
+        });
+
+        it("still enforces 8 total digit cap on integers", () => {
+            const state = dispatch([
+                "digit:1", "digit:2", "digit:3", "digit:4",
+                "digit:5", "digit:6", "digit:7", "digit:8", "digit:9"
+            ]);
+            expect(String(state.display)).toBe("12345678");
+        });
+    });
+
 });
